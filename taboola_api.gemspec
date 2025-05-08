@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "A comprehensive Ruby client for interacting with the Taboola API"
   spec.homepage = "https://github.com/k0va1/taboola_api"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 3.2.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
