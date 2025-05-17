@@ -124,7 +124,7 @@ puts report
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt.
+After checking out the repo, run `make install` to install dependencies. Then, run `make test` to run the tests. You can also run `bin/console` for an interactive prompt.
 
 ## License
 
