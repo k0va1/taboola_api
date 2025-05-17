@@ -17,11 +17,9 @@ jobs:
     steps:
       - name: Release Please
         uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GH_TOKEN }}
-          release-type: ruby
-          package-name: taboola_api
-          version-file: lib/taboola_api/version.rb
 
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
