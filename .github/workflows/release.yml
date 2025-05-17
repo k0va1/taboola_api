@@ -1,28 +1,47 @@
-name: Release RubyGem
+name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    env:
+      RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Release Please
+        uses: google-github-actions/release-please-action@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          release-type: ruby
+          package-name: taboola_api
+          version-file: lib/taboola_api/version.rb
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.2
+        if: ${{ steps.release.outputs.release_created }}
 
-      - name: Install dependencies
-        run: bundle install
-
-      - name: Build gem
-        run: gem build taboola_api.gemspec
-
-      - name: Push to RubyGems
-        run: gem push taboola_api-*.gem
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+      - name: Release Gem
+        run: |
+          gem install bundler
+          bundle config unset deployment
+          bundle install
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem
+        if: ${{ steps.release.outputs.release_created }}
