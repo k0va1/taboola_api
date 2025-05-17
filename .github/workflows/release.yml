@@ -13,35 +13,23 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
 
     steps:
       - name: Release Please
-        uses: google-github-actions/release-please-action@v4
+        uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GH_TOKEN }}
-          release-type: ruby
-          package-name: taboola_api
-          version-file: lib/taboola_api/version.rb
 
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
 
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         if: ${{ steps.release.outputs.release_created }}
+        with:
+          bundler-cache: true
+          ruby-version: 3.2
 
-      - name: Release Gem
-        run: |
-          gem install bundler
-          bundle config unset deployment
-          bundle install
-          mkdir -p $HOME/.gem
-          touch $HOME/.gem/credentials
-          chmod 0600 $HOME/.gem/credentials
-          printf -- "---\n:rubygems_api_key: ${RUBYGEMS_API_KEY}\n" > $HOME/.gem/credentials
-          gem build *.gemspec
-          gem push *.gem
+      - uses: rubygems/release-gem@v1
         if: ${{ steps.release.outputs.release_created }}
