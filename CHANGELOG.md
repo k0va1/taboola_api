@@ -1,1 +1,13 @@
 # Changelog
+
+## [0.1.0](https://github.com/k0va1/taboola_api/compare/taboola_api-v0.1.0...taboola_api/v0.1.0) (2025-05-17)
+
+
+### Features
+
+* add realtime stats methods ([3cd5236](https://github.com/k0va1/taboola_api/commit/3cd5236dcb4f9e93f84d81380952db4dae65c25b))
+
+
+### Miscellaneous Chores
+
+* release 0.1.0 ([604af8b](https://github.com/k0va1/taboola_api/commit/604af8b5fb4f501b193de6fed2e4d9ada5a585bd))

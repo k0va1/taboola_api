@@ -1,28 +1,35 @@
-name: Release RubyGem
+name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
       - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
+        if: ${{ steps.release.outputs.release_created }}
         with:
-          ruby-version: 3.2
+          bundler-cache: true
+          ruby-version: 3.4
 
-      - name: Install dependencies
-        run: bundle install
-
-      - name: Build gem
-        run: gem build taboola_api.gemspec
-
-      - name: Push to RubyGems
-        run: gem push taboola_api-*.gem
-        env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+      - uses: rubygems/release-gem@v1
+        if: ${{ steps.release.outputs.release_created }}
