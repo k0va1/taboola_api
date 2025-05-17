@@ -18,69 +18,108 @@ $ gem install taboola_api
 
 ## Usage
 
-### Configuration
+### Creating a Client
 
 ```ruby
 require 'taboola_api'
 
-TaboolaApi.configure do |config|
-  config.client_id = "your-client-id"
-  config.client_secret = "your-client-secret"
-  config.account_id = "your-account-id" # Optional
-  config.verbose = true # Optional
-  config.formatter = :json # Optional
-  config.output_color = :green # Optional
-end
+client = TaboolaApi::Client.new(
+  client_id: "your-client-id",
+  client_secret: "your-client-secret",
+  access_token: "your-access-token"
+)
+```
+
+### Accounts
+
+```ruby
+# List all allowed accounts
+accounts = client.accounts.list_all
+puts accounts
 ```
 
 ### Campaigns
 
 ```ruby
-# List campaigns
-campaigns = TaboolaApi.campaigns.list
+# List all campaigns
+campaigns = client.campaigns.list_all("account-id")
 puts campaigns
 
-# Get a campaign
-campaign = TaboolaApi.campaigns.get("campaign-id")
+# Get a specific campaign
+campaign = client.campaigns.get("account-id", "campaign-id")
 puts campaign
-
-# Create campaign
-new_campaign = TaboolaApi.campaigns.create({
-  name: "My Campaign",
-  branding_text: "My Brand",
-  cpc: 0.5
-})
-
-# Update campaign
-updated_campaign = TaboolaApi.campaigns.update("campaign-id", {
-  name: "Updated Campaign Name"
-})
-
-# Delete campaign
-TaboolaApi.campaigns.delete("campaign-id")
 ```
 
-### Account Information
+### Campaign Items
 
 ```ruby
-account_info = TaboolaApi.accounts.info
-puts account_info
+# List all campaign items
+campaign_items = client.campaign_items.list_all("account-id", "campaign-id")
+puts campaign_items
+
+# Get a specific campaign item
+campaign_item = client.campaign_items.get("account-id", "campaign-id", "item-id")
+puts campaign_item
+
+# Create a new campaign item
+new_campaign_item = client.campaign_items.create("account-id", "campaign-id", {
+  name: "New Campaign Item",
+  url: "https://example.com"
+})
+puts new_campaign_item
+
+# Update an existing campaign item
+updated_campaign_item = client.campaign_items.update("account-id", "campaign-id", "item-id", {
+  name: "Updated Campaign Item"
+})
+puts updated_campaign_item
 ```
 
-### Command Line Interface
+### Motion Ads
 
-```bash
-# Show help
-$ taboola-api help
+```ruby
+# List all motion ads
+motion_ads = client.motion_ads.list_all("account-id", "campaign-id")
+puts motion_ads
 
-# List campaigns
-$ taboola-api campaigns list --client-id YOUR_ID --client-secret YOUR_SECRET
+# Get a specific motion ad
+motion_ad = client.motion_ads.get("account-id", "campaign-id", "item-id")
+puts motion_ad
 
-# Get campaign
-$ taboola-api campaigns get CAMPAIGN_ID --client-id YOUR_ID --client-secret YOUR_SECRET
+# Create a new motion ad
+video_file = File.open("path/to/video.mp4")
+fallback_file = File.open("path/to/fallback.jpg")
+new_motion_ad = client.motion_ads.create("account-id", "campaign-id", video_file: video_file, fallback_file: fallback_file, {
+  name: "New Motion Ad"
+})
+puts new_motion_ad
 
-# Show version
-$ taboola-api version
+# Update an existing motion ad
+updated_motion_ad = client.motion_ads.update("account-id", "campaign-id", "item-id", {
+  name: "Updated Motion Ad"
+})
+puts updated_motion_ad
+```
+
+### Operations
+
+```ruby
+# Upload an image
+image_file = File.open("path/to/image.jpg")
+uploaded_image = client.operations.upload_image(image_file)
+puts uploaded_image
+```
+
+### Reportings
+
+```ruby
+# Get top campaign content report
+report = client.reportings.top_campaign_content_report(
+  account_id: "account-id",
+  start_date: "2023-01-01",
+  end_date: "2023-01-31"
+)
+puts report
 ```
 
 ## Development
