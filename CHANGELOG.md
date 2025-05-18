@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/k0va1/taboola_api/compare/v0.1.2...v0.1.3) (2025-05-18)
+
+
+### Features
+
+* allow to delete campaign items ([50b2d66](https://github.com/k0va1/taboola_api/commit/50b2d666f82229c49b0381454452a802e42350f2))
+
 ## [0.1.2](https://github.com/k0va1/taboola_api/compare/v0.1.1...v0.1.2) (2025-05-18)
 
 
