@@ -20,6 +20,11 @@ module TaboolaApi
         response = client.request(:post, "#{account_id}/campaigns/#{campaign_id}/items/#{item_id}", params)
         response.body
       end
+
+      def delete(account_id, campaign_id, item_id)
+        response = client.request(:delete, "#{account_id}/campaigns/#{campaign_id}/items/#{item_id}")
+        response.body
+      end
     end
   end
 end
