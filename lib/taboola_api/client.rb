@@ -9,6 +9,7 @@ module TaboolaApi
     HOST = "https://backstage.taboola.com/backstage"
     CURRENT_API_PATH = "api/1.0"
     DEFAULT_URL = "#{HOST}/#{CURRENT_API_PATH}"
+    TOKEN_REJECTED_STATUSES = [400, 401, 403].freeze
 
     def initialize(client_id:, client_secret:, access_token:)
       @client_id = client_id
@@ -64,22 +65,7 @@ module TaboolaApi
       body = response.body
       error_message = body.is_a?(Hash) ? body&.dig("message") : body
 
-      klass = case status
-      when 401
-        TaboolaApi::AuthenticationError
-      when 403
-        TaboolaApi::AuthorizationError
-      when 429
-        TaboolaApi::RateLimitError
-      when 400..499
-        TaboolaApi::InvalidRequestError
-      when 500..599
-        TaboolaApi::ApiError
-      else
-        TaboolaApi::Error
-      end
-
-      raise klass.new(error_message || "HTTP #{status}", status, body)
+      raise error_class_for(status).new(error_message || "HTTP #{status}", status, body)
     end
 
     def update_access_token
@@ -91,9 +77,19 @@ module TaboolaApi
           grant_type: "client_credentials"
         )
       end
-      data = JSON.parse(response.body)
 
-      @access_token = data["access_token"]
+      status = response.status
+      data = parse_token_body(response.body)
+      access_token = data["access_token"]
+
+      unless response.success? && access_token
+        klass = TOKEN_REJECTED_STATUSES.include?(status) ? TaboolaApi::AuthenticationError : error_class_for(status)
+        message = data["error_description"] || data["error"] || "Access token request failed with HTTP #{status}"
+        raise klass.new(message, status, response.body)
+      end
+
+      @connection = nil
+      @access_token = access_token
     end
 
     def accounts
@@ -118,6 +114,32 @@ module TaboolaApi
 
     def reportings
       @reportings ||= TaboolaApi::Resources::Reportings.new(self)
+    end
+
+    private
+
+    def error_class_for(status)
+      case status
+      when 401
+        TaboolaApi::AuthenticationError
+      when 403
+        TaboolaApi::AuthorizationError
+      when 429
+        TaboolaApi::RateLimitError
+      when 400..499
+        TaboolaApi::InvalidRequestError
+      when 500..599
+        TaboolaApi::ApiError
+      else
+        TaboolaApi::Error
+      end
+    end
+
+    def parse_token_body(body)
+      data = JSON.parse(body.to_s)
+      data.is_a?(Hash) ? data : {}
+    rescue JSON::ParserError
+      {}
     end
   end
 end
