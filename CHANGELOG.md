@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/k0va1/taboola_api/compare/v0.1.3...v0.1.4) (2026-11-23)
+
+
+### Bug Fixes
+
+* raise typed errors when the access token request fails ([011c01c](https://github.com/k0va1/taboola_api/commit/011c01c5a4aeb0b92d804bc1da121fa83168207b))
+
 ## [0.1.3](https://github.com/k0va1/taboola_api/compare/v0.1.2...v0.1.3) (2025-05-18)
 
 
